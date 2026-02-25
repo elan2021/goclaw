@@ -8,7 +8,8 @@ goclaw.exe
 
 # Directories
 web/dist/
-internal/web/dist/
+internal/web/dist/*
+!internal/web/dist/index.html
 .agent/
 .gemini/
 

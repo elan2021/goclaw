@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoClaw — AI Gateway</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --card: #141417;
+            --primary: #3b82f6; /* Blue */
+            --accent: #10b981; /* Green */
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logo span { color: var(--primary); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid #ffffff08;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-4px); }
+        .card h3 {
+            margin: 0 0 1rem 0;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #10b98120;
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.875rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: var(--card);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #ffffff08;
+        }
+        th {
+            background: #ffffff04;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .btn {
+            background: #ef444420;
+            color: #ef4444;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .btn:hover { background: #ef444430; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i data-lucide="antigravity"></i>
+                Go<span>Claw</span>
+            </div>
+            <div class="status-badge">
+                <div style="width: 8px; height: 8px; background: var(--accent); border-radius: 50%;"></div>
+                Sistema Online
+            </div>
+        </header>
+
+        <main>
+            <div class="grid">
+                <div class="card">
+                    <h3>Sessões Ativas</h3>
+                    <div class="value" id="count-sessions">-</div>
+                </div>
+                <div class="card">
+                    <h3>Uptime</h3>
+                    <div class="value" id="uptime">-</div>
+                </div>
+                <div class="card">
+                    <h3>Versão</h3>
+                    <div class="value" id="version">-</div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 3rem;">Sessões de Usuário</h2>
+            <table id="sessions-table">
+                <thead>
+                    <tr>
+                        <th>Usuário ID</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="3" style="text-align: center;">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function updateStats() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                document.getElementById('count-sessions').innerText = data.active_sessions;
+                document.getElementById('uptime').innerText = data.uptime.split('.')[0];
+                document.getElementById('version').innerText = data.version;
+            } catch (e) { console.error(e); }
+        }
+
+        async function updateSessions() {
+            try {
+                const res = await fetch('/api/sessions');
+                const data = await res.json();
+                const tbody = document.querySelector('#sessions-table tbody');
+                tbody.innerHTML = '';
+                
+                if (data.sessions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-dim);">Nenhuma sessão ativa</td></tr>';
+                    return;
+                }
+
+                data.sessions.forEach(id => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><code>${id}</code></td>
+                        <td><span style="color: var(--accent)">● Ativa</span></td>
+                        <td><button class="btn" onclick="killSession('${id}')">Kill</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function killSession(id) {
+            if (!confirm(`Encerrar sessão ${id}?`)) return;
+            await fetch(`/api/sessions/${id}/kill`, { method: 'POST' });
+            updateSessions();
+        }
+
+        setInterval(updateStats, 2000);
+        setInterval(updateSessions, 5000);
+        updateStats();
+        updateSessions();
+    </script>
+</body>
+</html>
