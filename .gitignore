@@ -1,0 +1,25 @@
+# Binaries
+bin/
+goclaw.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Directories
+web/dist/
+internal/web/dist/
+.agent/
+.gemini/
+
+# Config & Secrets
+config.toml
+*.env
+auth.db
+history/
+memory/
+schedules.json
+
+# OS files
+.DS_Store
+Thumbs.db

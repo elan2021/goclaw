@@ -1,0 +1,36 @@
+﻿go : # goclaw/internal/
+channel/whatsapp
+At line:1 char:1
++ go build ./internal/c
+hannel/whatsapp/ 2>&1 
+| Out-File -FilePath 
+build ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (# goclaw/inte   
+ rnal/channel/whats    
+app:String) [], Re    
+moteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+internal\channel\whatsa
+pp\adapter.go:62:93: 
+not enough arguments 
+in call to sqlstore.New
+	have (string, string, 
+*waLogger)
+	want 
+(context.Context, 
+string, string, 
+waLog.Logger)
+internal\channel\whatsa
+pp\adapter.go:67:22: 
+not enough arguments 
+in call to container.Ge
+tFirstDevice
+	have ()
+	want (context.Context)
