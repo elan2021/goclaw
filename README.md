@@ -25,7 +25,7 @@ GoClaw é um daemon de alto desempenho escrito em Go que transforma LLMs em agen
 ### 2. Instalação e Configuração Inicial
 ```bash
 # Clone e build
-git clone https://github.com/user/goclaw.git
+git clone https://github.com/elan2021/goclaw.git
 cd goclaw
 go build -o goclaw.exe ./cmd/goclaw
 
